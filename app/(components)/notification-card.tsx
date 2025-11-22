@@ -11,6 +11,7 @@ import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 
 import { Notification } from '../(types)/api';
+import styles from './notification-card.module.css';
 dayjs.extend(relativeTime);
 
 export const NotificationCard = ({
@@ -32,9 +33,13 @@ export const NotificationCard = ({
       withBorder
       style={{
         width: '100%',
-        cursor: 'pointer',
+        cursor: isRead ? undefined : 'pointer',
       }}
-      onClick={() => handleReadNotification(id)}
+      className={styles['notification-card']}
+      onClick={() => {
+        if (isRead) return;
+        handleReadNotification(id);
+      }}
     >
       {!isRead && (
         <IconCircleFilled
@@ -49,7 +54,7 @@ export const NotificationCard = ({
           <Text fw={isRead ? 400 : 600} fz={'sm'}>
             {title}
           </Text>
-          <Text fz='xs' c='dimmed'>
+          <Text fz='xs' c='dimmed' fw={isRead ? 400 : 500}>
             {message}
           </Text>
         </Stack>

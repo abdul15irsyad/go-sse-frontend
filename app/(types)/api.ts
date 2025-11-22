@@ -17,3 +17,14 @@ export type IGetCountNotificationsResponse = Omit<
   IGetNotificationsResponse,
   'data'
 >;
+export interface IGetUsersResponse {
+  data: {
+    id: string;
+    name: string;
+    username: string;
+  }[];
+  count: number;
+  message: string;
+}
+
+export type User = IGetUsersResponse['data'][number];

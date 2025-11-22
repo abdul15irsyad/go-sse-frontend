@@ -6,12 +6,10 @@ dotenv.config({
 
 export async function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;
-  console.log({ pathname });
   const accessToken = req.cookies.get('access_token')?.value;
 
   const getAuthUser = async () => {
-    console.log(`${process.env.NEXT_PUBLIC_API_URL}/auth/user`);
-    return fetch(`http://localhost:8765/auth/user`, {
+    return fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/user`, {
       method: 'GET',
       headers: {
         cookie: `access_token=${accessToken}`,

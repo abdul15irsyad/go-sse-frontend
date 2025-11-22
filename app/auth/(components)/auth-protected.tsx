@@ -1,6 +1,6 @@
 'use client';
 
-import { Loader } from '@mantine/core';
+import { Container, Flex, Loader } from '@mantine/core';
 import { ReactNode, useEffect } from 'react';
 
 import { useAuthUser } from '../(hooks)/api';
@@ -9,6 +9,7 @@ import { useAuthStore } from '../(stores)/auth.store';
 export const AuthProtected = ({ children }: { children: ReactNode }) => {
   const getAuthUser = useAuthUser();
   const { authUser, setAuthUser } = useAuthStore();
+
   useEffect(() => {
     const init = async () => {
       const authUserResponse = await getAuthUser.mutateAsync();
@@ -17,5 +18,19 @@ export const AuthProtected = ({ children }: { children: ReactNode }) => {
     init();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-  return authUser ? children : <Loader />;
+
+  return authUser ? (
+    children
+  ) : (
+    <Flex
+      justify='center'
+      align='center'
+      style={{ height: '100dvh' }}
+      bg='gray.1'
+    >
+      <Container fluid>
+        <Loader />
+      </Container>
+    </Flex>
+  );
 };

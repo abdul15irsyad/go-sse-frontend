@@ -1,5 +1,6 @@
-import { Box } from '@mantine/core';
-import React, { useCallback, useEffect } from 'react';
+import { Box, Button, Group } from '@mantine/core';
+import { IconChevronLeft, IconChevronRight } from '@tabler/icons-react';
+import React, { Dispatch, SetStateAction, useCallback } from 'react';
 
 import {
   useCountNotification,
@@ -9,65 +10,69 @@ import {
 import { EmptyState } from './empty-state';
 import { NotificationCard } from './notification-card';
 
-export const NotificationsPanel = ({
-  countNotification,
-}: {
+export type NotificationPanelProps = {
+  userNotifications: ReturnType<typeof useNotification>;
   countNotification: ReturnType<typeof useCountNotification>;
-}) => {
-  const { data, refetch } = useNotification({ status: 'all' });
+  page: number;
+  setPage: Dispatch<SetStateAction<number>>;
+};
 
+export const NotificationsPanel = ({
+  userNotifications,
+  countNotification,
+  page,
+  setPage,
+}: NotificationPanelProps) => {
   const readNotification = useReadNotification();
   const handleReadNotification = useCallback(
     async (id: string) => {
       await readNotification.mutateAsync(id);
-      await refetch();
+      await userNotifications.refetch();
       await countNotification.refetch();
     },
-    [countNotification, readNotification, refetch],
+    [countNotification, readNotification, userNotifications],
   );
-
-  useEffect(() => {
-    const eventSource = new EventSource(
-      `${process.env.NEXT_PUBLIC_API_URL}/notif/stream`,
-      {
-        withCredentials: true,
-      },
-    );
-
-    eventSource.onopen = () => {
-      console.log('SSE connected');
-    };
-
-    eventSource.onmessage = async (event) => {
-      console.log('Received:', event.data);
-      await countNotification.refetch();
-      await refetch();
-    };
-
-    eventSource.onerror = (err) => {
-      console.error('SSE error:', err);
-      eventSource.close();
-    };
-
-    return () => eventSource.close();
-  }, [countNotification, refetch]);
 
   return (
     <Box py={'sm'}>
-      {data?.data?.length === 0 ? (
+      {userNotifications?.data?.data?.length === 0 ? (
         <EmptyState />
       ) : (
-        data?.data?.map((notification, index, array) => (
-          <Box
-            key={notification.id}
-            mb={index <= array.length - 1 ? 'sm' : undefined}
-          >
-            <NotificationCard
-              notification={notification}
-              handleReadNotification={handleReadNotification}
-            />
+        <>
+          <Box mb='lg'>
+            {userNotifications?.data?.data?.map(
+              (notification, index, array) => (
+                <Box
+                  key={notification.id}
+                  mb={index <= array.length - 1 ? 'xs' : undefined}
+                >
+                  <NotificationCard
+                    notification={notification}
+                    handleReadNotification={handleReadNotification}
+                  />
+                </Box>
+              ),
+            )}
           </Box>
-        ))
+          <Group justify='space-between'>
+            <Button
+              leftSection={<IconChevronLeft size='1.25em' />}
+              color='dark'
+              variant='outline'
+              onClick={() => setPage((value) => value--)}
+            >
+              Prev
+            </Button>
+            <Button
+              rightSection={<IconChevronRight size='1.25em' />}
+              color='dark'
+              variant='outline'
+              onClick={() => setPage((value) => value++)}
+            >
+              Next
+            </Button>
+          </Group>
+        </>
       )}
     </Box>
   );

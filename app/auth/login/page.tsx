@@ -28,7 +28,7 @@ export default function LoginPage() {
 
   const form = useForm({
     initialValues: {
-      username: 'abdul',
+      username: 'killua',
       password: 'Qwerty123',
     },
   });
@@ -45,8 +45,7 @@ export default function LoginPage() {
         const response = await authUser.mutateAsync();
         setAuthUser(response.data);
         router.push('/');
-      } catch (error) {
-        console.error(error);
+      } catch {
         notifications.show({
           color: 'red',
           title: 'Failed',
@@ -94,6 +93,7 @@ export default function LoginPage() {
                 leftSection={<IconLogin size='1em' />}
                 type='submit'
                 radius='md'
+                loading={login.isPending}
               >
                 Login
               </Button>
